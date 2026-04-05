@@ -40,7 +40,6 @@ async function handleCommand(message) {
 async function step2_clickRegister() {
   log('Step 2: Looking for Register/Sign up button...');
 
-  // TODO: Adjust selectors based on actual OpenAI auth page
   let registerBtn = null;
   try {
     registerBtn = await waitForElementByText(

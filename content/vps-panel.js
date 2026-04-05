@@ -1,5 +1,5 @@
 // content/vps-panel.js — Content script for VPS panel (steps 1, 9)
-// Injected on: http://154.26.182.181:8317/*
+// Injected on: VPS panel (user-configured URL)
 //
 // Actual DOM structure (after login click):
 // <div class="card">
@@ -41,7 +41,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 async function handleStep(step, payload) {
   switch (step) {
     case 1: return await step1_getOAuthLink();
-    case 9: return await step9_vpsVerify();
+    case 9: return await step9_vpsVerify(payload);
     default:
       throw new Error(`vps-panel.js does not handle step ${step}`);
   }
@@ -105,14 +105,18 @@ async function step1_getOAuthLink() {
 // Step 9: VPS Verify — paste localhost URL and submit
 // ============================================================
 
-async function step9_vpsVerify() {
-  log('Step 9: Getting localhost URL from storage...');
-
-  const state = await chrome.runtime.sendMessage({ type: 'GET_STATE' });
-  const localhostUrl = state.localhostUrl;
+async function step9_vpsVerify(payload) {
+  // Get localhostUrl from payload (passed directly by background) or fallback to state
+  let localhostUrl = payload?.localhostUrl;
+  if (!localhostUrl) {
+    log('Step 9: localhostUrl not in payload, fetching from state...');
+    const state = await chrome.runtime.sendMessage({ type: 'GET_STATE' });
+    localhostUrl = state.localhostUrl;
+  }
   if (!localhostUrl) {
     throw new Error('No localhost URL found. Complete step 8 first.');
   }
+  log(`Step 9: Got localhostUrl: ${localhostUrl.slice(0, 60)}...`);
 
   log('Step 9: Looking for callback URL input...');
 

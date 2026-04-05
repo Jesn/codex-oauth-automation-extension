@@ -23,7 +23,7 @@ const DEFAULT_STATE = {
   flowStartTime: null,
   tabRegistry: {},
   logs: [],
-  vpsUrl: 'http://154.26.182.181:8317/management.html#/oauth',
+  vpsUrl: '',
   mailProvider: '163', // 'qq' or '163'
 };
 
@@ -39,14 +39,16 @@ async function setState(updates) {
 
 async function resetState() {
   console.log(LOG_PREFIX, 'Resetting all state');
-  // Preserve seenCodes, accounts, and tabRegistry across resets
-  const prev = await chrome.storage.session.get(['seenCodes', 'accounts', 'tabRegistry']);
+  // Preserve settings and persistent data across resets
+  const prev = await chrome.storage.session.get(['seenCodes', 'accounts', 'tabRegistry', 'vpsUrl', 'mailProvider']);
   await chrome.storage.session.clear();
   await chrome.storage.session.set({
     ...DEFAULT_STATE,
     seenCodes: prev.seenCodes || [],
     accounts: prev.accounts || [],
     tabRegistry: prev.tabRegistry || {},
+    vpsUrl: prev.vpsUrl || '',
+    mailProvider: prev.mailProvider || '163',
   });
 }
 
@@ -149,25 +151,39 @@ async function reuseOrCreateTab(source, url, options = {}) {
   const alive = await isTabAlive(source);
   if (alive) {
     const tabId = await getTabId(source);
-    // Navigate existing tab to new URL (or just activate if same URL)
+
+    // Mark as not ready BEFORE navigating — so READY signal from new page is captured correctly
+    const registry = await getTabRegistry();
+    if (registry[source]) registry[source].ready = false;
+    await setState({ tabRegistry: registry });
+
+    // Navigate existing tab to new URL
     await chrome.tabs.update(tabId, { url, active: true });
     console.log(LOG_PREFIX, `Reused tab ${source} (${tabId}), navigated to ${url.slice(0, 60)}`);
 
-    // Wait for page load
-    await new Promise(resolve => {
+    // Wait for page load complete (with 30s timeout)
+    await new Promise((resolve) => {
+      const timer = setTimeout(() => { chrome.tabs.onUpdated.removeListener(listener); resolve(); }, 30000);
       const listener = (tid, info) => {
         if (tid === tabId && info.status === 'complete') {
           chrome.tabs.onUpdated.removeListener(listener);
+          clearTimeout(timer);
           resolve();
         }
       };
       chrome.tabs.onUpdated.addListener(listener);
     });
 
-    // Mark as not ready — content script will re-inject and send READY
-    const registry = await getTabRegistry();
-    if (registry[source]) registry[source].ready = false;
-    await setState({ tabRegistry: registry });
+    // If dynamic injection needed (VPS panel), re-inject after navigation
+    if (options.inject) {
+      await chrome.scripting.executeScript({
+        target: { tabId },
+        files: options.inject,
+      });
+    }
+
+    // Wait a bit for content script to inject and send READY
+    await new Promise(r => setTimeout(r, 500));
 
     return tabId;
   }
@@ -178,10 +194,12 @@ async function reuseOrCreateTab(source, url, options = {}) {
 
   // If dynamic injection needed (VPS panel), inject scripts after load
   if (options.inject) {
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
+      const timer = setTimeout(() => { chrome.tabs.onUpdated.removeListener(listener); resolve(); }, 30000);
       const listener = (tabId, info) => {
         if (tabId === tab.id && info.status === 'complete') {
           chrome.tabs.onUpdated.removeListener(listener);
+          clearTimeout(timer);
           resolve();
         }
       };
@@ -550,8 +568,13 @@ async function autoRunLoop(totalRuns) {
     }
   }
 
-  await addLog(`=== All ${autoRunTotalRuns} runs finished ===`, 'ok');
-  chrome.runtime.sendMessage({ type: 'AUTO_RUN_STATUS', payload: { phase: 'complete', currentRun: autoRunCurrentRun, totalRuns: autoRunTotalRuns } }).catch(() => {});
+  const completedRuns = autoRunCurrentRun;
+  if (completedRuns >= autoRunTotalRuns) {
+    await addLog(`=== All ${autoRunTotalRuns} runs completed successfully ===`, 'ok');
+  } else {
+    await addLog(`=== Stopped after ${completedRuns}/${autoRunTotalRuns} runs ===`, 'warn');
+  }
+  chrome.runtime.sendMessage({ type: 'AUTO_RUN_STATUS', payload: { phase: 'complete', currentRun: completedRuns, totalRuns: autoRunTotalRuns } }).catch(() => {});
   autoRunActive = false;
   await setState({ autoRunning: false });
 }
@@ -895,13 +918,41 @@ async function executeStep9(state) {
   }
 
   await addLog('Step 9: Opening VPS panel...');
-  await reuseOrCreateTab('vps-panel', state.vpsUrl, { inject: ['content/utils.js', 'content/vps-panel.js'] });
 
-  await sendToContentScript('vps-panel', {
+  let tabId = await getTabId('vps-panel');
+  const alive = tabId && await isTabAlive('vps-panel');
+
+  if (!alive) {
+    // Create new tab
+    const tab = await chrome.tabs.create({ url: state.vpsUrl, active: true });
+    tabId = tab.id;
+    await new Promise(resolve => {
+      const listener = (tid, info) => {
+        if (tid === tabId && info.status === 'complete') {
+          chrome.tabs.onUpdated.removeListener(listener);
+          resolve();
+        }
+      };
+      chrome.tabs.onUpdated.addListener(listener);
+    });
+  } else {
+    await chrome.tabs.update(tabId, { active: true });
+  }
+
+  // Inject scripts directly and wait for them to be ready
+  await chrome.scripting.executeScript({
+    target: { tabId },
+    files: ['content/utils.js', 'content/vps-panel.js'],
+  });
+  await new Promise(r => setTimeout(r, 1000));
+
+  // Send command directly — bypass queue/ready mechanism
+  await addLog(`Step 9: Filling callback URL...`);
+  await chrome.tabs.sendMessage(tabId, {
     type: 'EXECUTE_STEP',
     step: 9,
     source: 'background',
-    payload: {},
+    payload: { localhostUrl: state.localhostUrl },
   });
 }
 

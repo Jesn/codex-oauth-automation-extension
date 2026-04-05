@@ -107,7 +107,6 @@ async function restoreState() {
 function updateStepUI(step, status) {
   const statusEl = document.querySelector(`.step-status[data-step="${step}"]`);
   const row = document.querySelector(`.step-row[data-step="${step}"]`);
-  const indicator = document.querySelector(`.step-indicator[data-step="${step}"]`);
 
   if (statusEl) statusEl.textContent = STATUS_ICONS[status] || '';
   if (row) {

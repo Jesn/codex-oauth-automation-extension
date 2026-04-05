@@ -75,7 +75,7 @@
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-primary);
   background: var(--bg-base);
   padding: 12px;
@@ -107,7 +107,7 @@ header {
 .header-left svg { color: var(--blue); }
 
 .header-left h1 {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--text-primary);
@@ -149,10 +149,10 @@ header {
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 6px 12px;
+  gap: 6px;
+  padding: 7px 14px;
   font-family: inherit;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
@@ -180,21 +180,22 @@ header {
 }
 
 .run-count-input {
-  width: 38px;
-  padding: 5px 4px;
+  width: 42px;
+  padding: 6px 4px;
   text-align: center;
   background: var(--bg-base);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
   font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   outline: none;
 }
 .run-count-input:focus { border-color: var(--blue); }
 .run-count-input::-webkit-inner-spin-button { opacity: 0.5; }
-.btn-success:disabled { background: var(--bg-elevated); color: var(--text-muted); cursor: not-allowed; box-shadow: none; }
+.btn-success:disabled, .btn-primary:disabled { background: var(--bg-elevated); color: var(--text-muted); cursor: not-allowed; box-shadow: none; }
+.run-count-input:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .btn-ghost {
   background: transparent;
@@ -211,8 +212,8 @@ header {
 }
 .btn-outline:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-soft); }
 
-.btn-sm { padding: 4px 10px; font-size: 11px; }
-.btn-xs { padding: 3px 8px; font-size: 10px; }
+.btn-sm { padding: 5px 12px; font-size: 12px; }
+.btn-xs { padding: 4px 10px; font-size: 11px; }
 
 /* ============================================================
    Data Card
@@ -224,10 +225,10 @@ header {
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 10px 12px;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 9px;
   box-shadow: var(--shadow-sm);
 }
 
@@ -238,8 +239,8 @@ header {
 }
 
 .data-label {
-  width: 54px;
-  font-size: 10px;
+  width: 56px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -248,7 +249,7 @@ header {
 }
 
 .data-value {
-  font-size: 11px;
+  font-size: 13px;
   color: var(--text-muted);
   min-width: 0;
 }
@@ -257,7 +258,7 @@ header {
 
 .mono {
   font-family: 'JetBrains Mono', 'Consolas', monospace;
-  font-size: 10.5px;
+  font-size: 12px;
 }
 
 .truncate {
@@ -268,13 +269,13 @@ header {
 
 .data-input {
   flex: 1;
-  padding: 5px 8px;
+  padding: 7px 10px;
   background: var(--bg-base);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
   font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
+  font-size: 13px;
   outline: none;
   transition: border-color var(--transition), box-shadow var(--transition);
   min-width: 0;
@@ -284,13 +285,13 @@ header {
 
 .data-select {
   flex: 1;
-  padding: 5px 8px;
+  padding: 7px 10px;
   background: var(--bg-base);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
   font-family: inherit;
-  font-size: 11px;
+  font-size: 13px;
   outline: none;
   cursor: pointer;
   transition: border-color var(--transition);
@@ -305,19 +306,19 @@ header {
   align-items: center;
   gap: 8px;
   margin-top: 8px;
-  padding: 6px 10px;
+  padding: 8px 12px;
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--text-secondary);
   box-shadow: var(--shadow-sm);
 }
 
 .status-dot {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--text-muted);
   flex-shrink: 0;
@@ -353,7 +354,7 @@ header {
   gap: 8px;
 }
 .auto-continue-bar svg { color: var(--orange); flex-shrink: 0; }
-.auto-hint { font-size: 11px; color: var(--orange); flex: 1; font-weight: 500; }
+.auto-hint { font-size: 13px; color: var(--orange); flex: 1; font-weight: 500; }
 
 /* ============================================================
    Steps Section
@@ -369,7 +370,7 @@ header {
 }
 
 .section-label {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -378,7 +379,7 @@ header {
 
 .steps-progress {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--text-muted);
   background: var(--bg-surface);
@@ -390,7 +391,7 @@ header {
 .steps-list {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 5px;
 }
 
 .step-row {
@@ -403,8 +404,8 @@ header {
 
 /* Step Number Indicator */
 .step-indicator {
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   background: var(--bg-surface);
   border: 1.5px solid var(--border);
@@ -416,7 +417,7 @@ header {
 }
 
 .step-num {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--text-muted);
   transition: color var(--transition);
@@ -435,9 +436,9 @@ header {
 /* Step Button */
 .step-btn {
   flex: 1;
-  padding: 6px 10px;
+  padding: 8px 12px;
   font-family: inherit;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--text-primary);
   background: var(--bg-surface);
@@ -456,9 +457,9 @@ header {
 .step-row.failed .step-btn { border-color: var(--red); color: var(--red); }
 
 .step-status {
-  width: 18px;
+  width: 20px;
   text-align: center;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -480,11 +481,11 @@ header {
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 8px 10px;
+  padding: 10px 12px;
   height: 220px;
   overflow-y: auto;
   font-family: 'JetBrains Mono', 'Consolas', monospace;
-  font-size: 10.5px;
+  font-size: 12px;
   line-height: 1.7;
   color: var(--text-secondary);
   box-shadow: var(--shadow-sm);
@@ -495,7 +496,7 @@ header {
 #log-area::-webkit-scrollbar-thumb { background: var(--bg-elevated); border-radius: 4px; }
 #log-area::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-.log-line { padding: 1.5px 0; }
+.log-line { padding: 2.5px 0; }
 .log-line + .log-line { border-top: 1px solid var(--border-subtle); }
 
 .log-time { color: var(--text-muted); }
@@ -508,10 +509,10 @@ header {
 
 .log-step-tag {
   display: inline-block;
-  padding: 0 4px;
+  padding: 1px 5px;
   border-radius: 3px;
   font-weight: 700;
-  font-size: 9.5px;
+  font-size: 11px;
   margin-right: 3px;
 }
 .log-step-tag.step-1 { color: var(--cyan); background: rgba(8, 145, 178, 0.08); }
@@ -561,9 +562,9 @@ header {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 12px;
+  padding: 10px 14px;
   border-radius: var(--radius-md);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   box-shadow: var(--shadow-md), 0 4px 12px rgba(0,0,0,0.1);
   pointer-events: auto;
